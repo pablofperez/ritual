@@ -17,7 +17,7 @@ const messaging = getMessaging(app);
 Notification.requestPermission().then((permission) => {
   if (permission === "granted") {
     getToken(messaging, {
-      vapidKey: "BKqQJWREPLACE_THIS_WITH_REAL_KEY"
+      vapidKey: "BC70s8MosYRhcmjbv5c2HaEVqkzkeHVGec94Zlj4_JEFGL5IJ4Y-5a8yKQLIT5SgMGo8OesSWw-10EpzKu2d7BQ"
     }).then((currentToken) => {
       if (currentToken) {
         console.log("Token recibido:", currentToken);
