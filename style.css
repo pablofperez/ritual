@@ -1,37 +1,28 @@
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color: #0e0e0e;
   color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
-  overflow: hidden;
+  text-align: center;
 }
 #splash {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   height: 100vh;
-  background: #0e0e0e;
   animation: fadeOut 3s ease 2s forwards;
 }
 #splash h1 {
   font-size: 3em;
-  opacity: 0;
+  color: white;
   animation: fadeIn 2s ease-in-out forwards;
 }
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
-@keyframes fadeOut {
-  to { opacity: 0; display: none; }
-}
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; display: none; } }
 main {
   padding: 2rem;
+  animation: fadeIn 1s ease forwards;
 }
 ul {
   list-style: none;
@@ -39,12 +30,23 @@ ul {
 }
 li {
   margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 input[type="checkbox"] {
   margin-right: 1rem;
 }
+button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #0e0e0e;
+  border: none;
+  border-radius: 5px;
+}
 #message {
   margin-top: 2rem;
   font-size: 1.2rem;
-  text-align: center;
+  font-style: italic;
 }

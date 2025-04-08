@@ -1,12 +1,21 @@
 
 const checklistData = {
-  "Lunes": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Retinoide", "Hidratante"],
-  "Martes": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Glicólico", "Hidratante"],
-  "Miércoles": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Hidratante"],
-  "Jueves": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Retinoide", "Hidratante"],
-  "Viernes": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Glicólico", "Hidratante"],
-  "Sábado": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Hidratante"],
-  "Domingo": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Retinoide", "Hidratante"]
+  "Lunes": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Hidratante", "Protector solar"],
+  "Martes": ["Limpieza", "Glicólico", "Hyalu B5", "Contorno de ojos", "Hidratante", "Protector solar"],
+  "Miércoles": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Hidratante", "Protector solar"],
+  "Jueves": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Hidratante", "Protector solar"],
+  "Viernes": ["Limpieza", "Glicólico", "Hyalu B5", "Contorno de ojos", "Hidratante", "Protector solar"],
+  "Sábado": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Hidratante", "Protector solar"],
+  "Domingo": ["Limpieza", "Hyalu B5", "Contorno de ojos", "Hidratante", "Protector solar"]
+};
+
+const explicaciones = {
+  "Limpieza": "Cetaphil Limpiador: aplicá sobre piel húmeda, masajeá 30 segundos y enjuagá.",
+  "Hyalu B5": "La Roche-Posay Hyalu B5: aplicá 2-3 gotas en todo el rostro antes del hidratante.",
+  "Contorno de ojos": "The Ordinary Caffeine: 1 gota por ojo con golpecitos suaves.",
+  "Hidratante": "CeraVe Loción Hidratante: aplicá una capa en rostro y cuello.",
+  "Protector solar": "Avène Mat Perfect FPS 50+: 2 dedos de producto. Reaplicá si salís.",
+  "Glicólico": "The Ordinary Glycolic 7%: aplicá con algodón solo de noche, 2 veces por semana."
 };
 
 const dayNames = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
@@ -15,43 +24,67 @@ const dayName = dayNames[today.getDay()];
 document.getElementById("day-title").textContent = "Ritual de " + dayName;
 
 const checklist = document.getElementById("checklist");
-const items = checklistData[dayName] || [];
+let allItems = checklistData[dayName] || [];
 
-items.forEach(item => {
-  const li = document.createElement("li");
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.id = item;
-  checkbox.checked = localStorage.getItem(item + dayName) === "true";
-  checkbox.addEventListener("change", () => {
-    localStorage.setItem(item + dayName, checkbox.checked);
-    checkCompleted();
+function createChecklist(items) {
+  checklist.innerHTML = "";
+  items.forEach(item => {
+    const li = document.createElement("li");
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = item;
+    checkbox.checked = localStorage.getItem(item + dayName) === "true";
+    checkbox.addEventListener("change", () => {
+      localStorage.setItem(item + dayName, checkbox.checked);
+      checkCompleted();
+    });
+
+    label.textContent = item;
+    const info = document.createElement("button");
+    info.textContent = "?";
+    info.style.marginLeft = "1rem";
+    info.onclick = () => alert(explicaciones[item] || "Sin info");
+
+    li.appendChild(checkbox);
+    li.appendChild(label);
+    li.appendChild(info);
+    checklist.appendChild(li);
   });
-  const label = document.createElement("label");
-  label.htmlFor = item;
-  label.textContent = item;
-  li.appendChild(checkbox);
-  li.appendChild(label);
-  checklist.appendChild(li);
-});
+}
 
 function checkCompleted() {
-  const allChecked = items.every(item => localStorage.getItem(item + dayName) === "true");
-  const msg = document.getElementById("message");
-  if (allChecked) {
-    msg.textContent = "¡Ritual completado!";
-  } else {
-    msg.textContent = "";
-  }
+  const allChecked = allItems.every(item => localStorage.getItem(item + dayName) === "true");
+  document.getElementById("message").textContent = allChecked ? "¡Ritual completado! Tu piel te lo va a agradecer." : "";
+}
+
+function resetChecklist() {
+  allItems.forEach(item => localStorage.removeItem(item + dayName));
+  createChecklist(allItems);
+  document.getElementById("message").textContent = "";
+}
+
+function showAll() {
+  allItems = Array.from(new Set(Object.values(checklistData).flat()));
+  document.getElementById("day-title").textContent = "Ritual completo";
+  createChecklist(allItems);
+  document.getElementById("message").textContent = "";
 }
 
 setTimeout(() => {
   document.getElementById("splash").style.display = "none";
   document.getElementById("app").style.display = "block";
+  createChecklist(allItems);
   checkCompleted();
 }, 3000);
 
-// Notificaciones locales
+if (Notification.permission !== "granted") {
+  Notification.requestPermission();
+} else {
+  scheduleNotification("Ritual", "¿Hiciste tu ritual de mañana?", 8, 30);
+  scheduleNotification("Ritual", "Recordá tu ritual de noche", 0, 0);
+}
+
 function scheduleNotification(title, body, hour, minute) {
   const now = new Date();
   const target = new Date();
@@ -62,11 +95,4 @@ function scheduleNotification(title, body, hour, minute) {
     new Notification(title, { body });
     scheduleNotification(title, body, hour, minute);
   }, delay);
-}
-
-if (Notification.permission !== "granted") {
-  Notification.requestPermission();
-} else {
-  scheduleNotification("Ritual", "¿Hiciste tu ritual de mañana?", 8, 30);
-  scheduleNotification("Ritual", "Recordá tu ritual de noche", 0, 0);
 }
